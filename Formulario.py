@@ -1,10 +1,13 @@
 from tkinter import *
 from tkinter import ttk
+import csv
 
 
 class datos:
     def __init__(self,raiz):
         #VARIABLES
+
+        self.raiz = Tk()
         
         principal=ttk.Frame(raiz)
         principal.grid()
@@ -19,30 +22,35 @@ class datos:
         estado = StringVar()
         raiz.title("Muestra Widgets")
     
-        comboEstados = ttk.Combobox(principal, textvariable=estado)
+        #ESTADOS
+        self.estado = StringVar()
+        comboEstados = ttk.Combobox(principal, textvariable=self.estado)
         comboEstados.grid(column=1, row= 10)
         comboEstados['values'] = ("Jalisco", "Nayarit", "Colima", "Michoacan")
 
-        #FRAME CHECk
+        #RADIOBUTTON
+        self.ocupacion=StringVar()
+
         emple = ttk.Frame(principal, padding="10 10 10 10")
         emple.grid(column= 1, row= 2)
 
-        Estudiante = ttk.Radiobutton(emple, text="Estudiante")
-        Estudiante.grid(column=5,row=1, sticky=(W))
-        Empleado = ttk.Radiobutton(emple, text="Empleado")
-        Empleado.grid(column=5,row=2,pady=5, sticky=(W))
-        Desempleado = ttk.Radiobutton(emple, text="Desempleado")
-        Desempleado.grid(column=5,row=3,pady=5, sticky=(W))
+        Estudiante = ttk.Radiobutton(emple, text="Estudiante",value='Estudiante',variable=self.ocupacion).grid(column=5,row=1, sticky=(W))
+        Empleado = ttk.Radiobutton(emple, text="Empleado", value='Empleado',variable=self.ocupacion).grid(column=5,row=2,pady=5, sticky=(W))
+        Desempleado = ttk.Radiobutton(emple, text="Desempleado",value='Desempleado', variable=self.ocupacion).grid(column=5,row=3,pady=5, sticky=(W))
+       
 
-        #FRAME AFICIONES
+        #CHECKBOTTON
+        self.afi=StringVar()
+        self.afi2=StringVar()
+        self.afi3=StringVar()
+
         Aficiones = ttk.Frame(principal, padding="10 10 30 30",relief="raised")
         Aficiones.grid(column=0, row=9, rowspan=5)
-
-        Leer = ttk.Checkbutton(Aficiones, text="Leer")
+        Leer = ttk.Checkbutton(Aficiones, text="Leer", variable=self.afi)
         Leer.grid(column=0,row=0)
-        Musica = ttk.Checkbutton(Aficiones, text="Musica")
+        Musica = ttk.Checkbutton(Aficiones, text="Musica", variable=self.afi2)
         Musica.grid(column=1,row=0)
-        VideoJuegos = ttk.Checkbutton(Aficiones, text="VideoJuegos")
+        VideoJuegos = ttk.Checkbutton(Aficiones, text="VideoJuegos", variable=self.afi3)
         VideoJuegos.grid(column=2,row=0)
 
 
@@ -50,7 +58,7 @@ class datos:
         botones = ttk.Frame(principal, padding="10 10 10 10")
         botones.grid(column=0, row=20)
 
-        btnCancelar = ttk.Button(botones, text="Cancelar", compound="bottom")
+        btnCancelar = ttk.Button(botones, text="Cancelar", command=self.Cerrar)
         btnCancelar.grid(column=1,row=1)
 
     
@@ -59,6 +67,9 @@ class datos:
         self.AMaterno=StringVar()
         self.Correo=StringVar()
         self.Movil=StringVar()
+        self.Leer=StringVar()
+        self.Musica=StringVar()
+        self.VideoJuegos=StringVar()
 
         Usuario = ttk.Frame(principal, padding="10 10 10 10", relief="raised")
         Usuario.grid(column=0, row=1,rowspan=5)
@@ -82,27 +93,85 @@ class datos:
         ttk.Label(Usuario, text="Movil").grid(column=0, row=4,pady=20)
 
         btnGuardar = ttk.Button(botones, text="Guardar", command=self.guardar).grid(column=0,row=1)
+        btnmostrar=ttk.Button(botones,text="Ver datos",command=self.ver_datos)
+        btnmostrar.grid(column=0, row=2)
+
+        self.raiz.mainloop()
         
-    def guardar(self, *args):
-            print("Boton GUARDAR precionado")
+    def guardar(self):
+            print("Boton GUARDAR presionado")
             nomUsuario = self.Nombre.get()
-            print("Nombre ingresado:", nomUsuario)
             apPaternoUsu = self.AParerno.get()
-            print("ApPaterno Ingresado:", apPaternoUsu)
-            apMaternoUsu = self.AMaterno.get()
-            print("apMaterno Ingresado:", apMaternoUsu)
+            apMaternoUsu = self.AMaterno.get() 
             correoUsuario = self.Correo.get()
-            print("Correo Ingresado:", correoUsuario)
             movilUsu = self.Movil.get()
-            print('Movil Ingresado:' , movilUsu)
- 
-            nom=str(nomUsuario)
-            apat=str(apPaternoUsu)
-            amat=str(apMaternoUsu)
-            corr=str(correoUsuario)
-            mov=str(movilUsu)
+            Aficiones = self.afi.get()
+            Aficiones2=self.afi2.get()
+            Aficiones3=self.afi3.get()
+            Ocupaciones = self.ocupacion.get()
+            Estado = self.estado.get()
+    
+           
 
-            info=(nom + ',' + apat + ',' + amat + ',' + corr + ',' + mov + '\n')
 
-            with open('info.csv', 'a', newline='') as file:
-                file.writelines(info)
+            with open("info.csv", "a", newline="") as archivo:
+
+            # Abrimos el archivo en modo escritura
+                escritor = csv.writer(archivo)
+            # Si el archivo está vacío escribimos la primera línea con los encabezados
+                if archivo.tell() == 0:
+                    escritor.writerow(['Nombre','A_paterno','A_materno','Correo','Movil','Leer','Musica','Videojuegos','Estado','Ocupacion'])
+            # Escribimos los datos del formulario en una nueva línea
+                escritor.writerow([nomUsuario, apPaternoUsu, apMaternoUsu, correoUsuario, movilUsu, Aficiones, Aficiones2, Aficiones3, Estado, Ocupaciones])
+
+
+                
+
+    def Cerrar(self):
+         self.raiz.destroy
+            
+    def ver_datos(self):
+        ventana = Toplevel(self.raiz)
+        ventana.title("Datos almacenados")
+        
+        with open("info.csv", mode="r") as file:
+            lector = csv.reader(file)
+
+            # Creamos la tabla utilizando un LabelFrame y Labels
+            table_frame = ttk.LabelFrame(ventana, text='Datos')
+            table_frame.pack(fill=BOTH, expand=1, padx=5, pady=5)
+
+            row_num = 0
+            for row in lector:
+                label_1 = ttk.Label(table_frame, text=row[0], width=20, borderwidth=1, relief='solid')
+                label_1.grid(row=row_num, column=0)
+                
+                label_2 = ttk.Label(table_frame, text=row[1], width=20, borderwidth=1, relief='solid')
+                label_2.grid(row=row_num, column=1)
+                
+                label_3 = ttk.Label(table_frame, text=row[2], width=20, borderwidth=1, relief='solid')
+                label_3.grid(row=row_num, column=2)
+
+                label_4 = ttk.Label(table_frame, text=row[3], width=20, borderwidth=1, relief='solid')
+                label_4.grid(row=row_num, column=3)
+                
+                label_5 = ttk.Label(table_frame, text=row[4], width=20, borderwidth=1, relief='solid')
+                label_5.grid(row=row_num, column=4)
+                
+                label_6 = ttk.Label(table_frame, text=row[5], width=20, borderwidth=1, relief='solid')
+                label_6.grid(row=row_num, column=5)
+
+                label_7 = ttk.Label(table_frame, text=row[6], width=20, borderwidth=1, relief='solid')
+                label_7.grid(row=row_num, column=6)
+                
+                label_8 = ttk.Label(table_frame, text=row[7], width=20, borderwidth=1, relief='solid')
+                label_8.grid(row=row_num, column=7)
+                
+                label_9 = ttk.Label(table_frame, text=row[8], width=20, borderwidth=1, relief='solid')
+                label_9.grid(row=row_num, column=8)
+
+                label_10 = ttk.Label(table_frame, text=row[9], width=20, borderwidth=1, relief='solid')
+                label_10.grid(row=row_num, column=9)
+
+                row_num += 1
+
